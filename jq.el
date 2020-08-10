@@ -55,7 +55,7 @@
     (string-match (rx ?. (group (1+ word))) name)
     (match-string-no-properties 1 name)))
 
-(defmacro jq (exprs)
+(cl-defmacro jq (&rest exprs)
   "jq macro."
   (pcase exprs
     (`(,(and expr (pred symbolp)) . ,exprs)
@@ -68,7 +68,7 @@
 	     `(jq/match-field
 	       ,field
 	       ;;on success
-	       (lambda () (funcall  (jq ,exprs) succ err))
+	       (lambda () (funcall  (jq ,@exprs) succ err))
 	       err))))))
     (_
      `(lambda (succ err)
