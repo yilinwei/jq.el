@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t; -*-
 
+(require 'json)
+
 (setq lexical-binding t)
 
 (defsubst jq/curry (f &rest args)

@@ -17,7 +17,3 @@
  field-nested-test
  (jq (.foo .bar))
  '((foo . ((bar . "moo")))) "moo")
-
-
-
-
