@@ -4,9 +4,6 @@
 
 (setq lexical-binding t)
 
-(defsubst jq/curry (f &rest args)
-  (lambda (&rest rest) (apply f (append args rest))))
-
 (cl-defun jq/skip-obj (succ err)
   "Skip a JSON object where SUCC and ERR are continuations."
   (if (search-forward-regexp (rx (or ?{  ?})))
@@ -31,7 +28,7 @@
       ((attrib (rx ?\" (group (1+ word)) ?\" ?:)))
     (cl-flet
 	;; define matchers
-	((field-p (jq/curry #'string-equal field)))
+	((field-p (apply-partially #'string-equal field)))
 	(letrec
 	    ((seek
 	      (lambda ()
