@@ -28,7 +28,7 @@
 (cl-defun jq/match-field (field succ err)
   "Match FIELD where SUCC and ERR are continuations."
   (cl-letf
-      ((attrib (rx ?" (group (1+ word)) ?" ?:)))
+      ((attrib (rx ?\" (group (1+ word)) ?\" ?:)))
     (cl-flet
 	;; define matchers
 	((field-p (jq/curry #'string-equal field)))
