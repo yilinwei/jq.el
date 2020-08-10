@@ -4,6 +4,16 @@
 
 (setq lexical-binding t)
 
+(cl-defmacro jq/motion (expr &rest exprs)
+  `(let ((point (point)))
+     (let
+	 ((result (progn
+	       ,expr
+	       ,@exprs)))
+       ;; return point
+       (goto-char point)
+       result)))
+
 (cl-defun jq/skip-obj (succ err)
   "Skip a JSON object where SUCC and ERR are continuations."
   (if (search-forward-regexp (rx (or ?{  ?})))
@@ -21,6 +31,25 @@
 	((rx ?}) (funcall err))
 	((rx ?{) (jq/skip-obj succ err)))
     (funcall err)))
+
+(cl-defun jq/for-each1 (succ err)
+  (jq/motion
+   (if (search-forward-regexp (rx (or (group (or ?,)) (group ?\])) ))
+       (cl-letf
+	   ((next (apply-partially #'jq/for-each1 succ err)))
+	   (pcase (or (match-string-no-properties 1) (match-string-no-properties 2))
+	     ((rx ?,)
+	       (funcall succ next))
+	     ((rx ?\])
+	      nil))))))
+
+(cl-defun jq/for-each (succ err)
+  (jq/motion
+   (goto-char (1+ (point)))
+   (cl-letf
+       ((next (apply-partially #'jq/for-each1 succ err)))
+     ;;TODO: empty
+     (funcall succ next))))
 
 (cl-defun jq/match-field (field succ err)
   "Match FIELD where SUCC and ERR are continuations."
